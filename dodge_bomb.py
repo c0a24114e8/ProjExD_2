@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -9,12 +10,12 @@ DELTA = {
     pg.K_UP: (0, -5),
     pg.K_DOWN: (0, +5),
     pg.K_LEFT: (-5, 0),
-    pg.K_RIGHT: (+5, 0),    
+    pg.K_RIGHT: (+5, 0),  # Practice1 
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
+def check_bound(rct: pg.Rect) -> tuple[bool, bool]:  # Practice3 
     """
     引数：こうかとんRectかばくだんRect
     戻り値：判定結果タプル（横, 縦）
@@ -26,6 +27,30 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     if rct.top < 0 or HEIGHT < rct.bottom:
         tate = False
     return yoko, tate
+
+def gameover(screen: pg.Surface) -> None:  # Exercise1 Complite
+    black = pg.Surface((WIDTH, HEIGHT))
+    pg.draw.rect(black, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
+    pg.Surface.set_alpha(black, 120)
+    gameover_font = pg.font.Font(None, 80)
+    txt = gameover_font.render("Game Over", True, (255, 255, 255))
+    txt_rct = txt.get_rect(center=(WIDTH / 2, HEIGHT / 2))
+    go_kk_img = pg.image.load("fig/8.png")
+    go_kk_img_rct1 = go_kk_img.get_rect(center=((WIDTH / 2) + 200, HEIGHT / 2))
+    go_kk_img_rct2 = go_kk_img.get_rect(center=((WIDTH / 2) - 200, HEIGHT / 2))
+    screen.blit(black, (0, 0))
+    screen.blit(txt, txt_rct)
+    screen.blit(go_kk_img, go_kk_img_rct1)
+    screen.blit(go_kk_img, go_kk_img_rct2)
+    pg.display.update()
+    time.sleep(5)
+    return
+    
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    bb_accs = [a for a in range(1, 11)]
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -50,7 +75,8 @@ def main():
         screen.blit(bg_img, [0, 0]) 
 
         if kk_rct.colliderect(bb_rct):
-            return
+            gameover(screen)
+            return  # Practice4
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
@@ -71,7 +97,7 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)
+        bb_rct.move_ip(vx, vy)  # Practice2
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             vx *= -1
